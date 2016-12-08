@@ -2,8 +2,6 @@ package cz.uhk.pro2.flappy.game;
 
 import java.awt.Graphics;
 
-import cz.uhk.pro2.flappy.game.tiles.WallTile;
-
 public class GameBoard implements TickAware{
 	Tile[][] tiles;
 	int shiftX = 30;
@@ -12,7 +10,7 @@ public class GameBoard implements TickAware{
 	
 	public GameBoard() {
 		tiles = new Tile[20][20]; //TO DO
-		tiles[2][1] = new WallTile();
+		//tiles[2][1] = new WallTile();
 		bird = new Bird(viewportWidth/2, tiles.length*Tile.SIZE/2);
 	}
 	
