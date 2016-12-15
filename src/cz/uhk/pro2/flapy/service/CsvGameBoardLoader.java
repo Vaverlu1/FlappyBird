@@ -15,6 +15,8 @@ import javax.imageio.ImageIO;
 
 import cz.uhk.pro2.flappy.game.GameBoard;
 import cz.uhk.pro2.flappy.game.Tile;
+import cz.uhk.pro2.flappy.game.tiles.BonusTile;
+import cz.uhk.pro2.flappy.game.tiles.EmptyTile;
 import cz.uhk.pro2.flappy.game.tiles.WallTile;
 
 	
@@ -34,7 +36,7 @@ public class CsvGameBoardLoader implements GameBoardLoader{
 			for (int i = 0; i < typeCount; i++){
 				line = br.readLine().split(";");
 				String tileType = line[0];
-				String clazz = line[0];
+				String clazz = line[1];
 				int x = Integer.parseInt(line[2]);
 				int y = Integer.parseInt(line[3]);
 				int w = Integer.parseInt(line[4]);
@@ -78,9 +80,14 @@ public class CsvGameBoardLoader implements GameBoardLoader{
 			Graphics2D g = resizedImage.createGraphics();
 			g.drawImage(croppedImage, 0, 0, Tile.SIZE,Tile.SIZE, null);
 			switch (clazz){
-			default:
+			case "Wall":
 				return new WallTile(resizedImage);
+			case "Empty":
+				return new EmptyTile(resizedImage);
+			case "Bonus":
+				return new BonusTile(resizedImage);
 			}
+			throw new RuntimeException("Neznámý typ dlaždice " + clazz);
 		} catch (MalformedInputException e){
 			throw new RuntimeException("Špatna URL pro obrázek " + clazz + ": " + url, e);
 		} catch (IOException e){

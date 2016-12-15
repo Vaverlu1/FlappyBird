@@ -2,11 +2,16 @@ package cz.uhk.pro2.flappy.game;
 
 import java.awt.Graphics;
 
+import cz.uhk.pro2.flappy.game.tiles.BonusTile;
+import cz.uhk.pro2.flappy.game.tiles.EmptyTile;
+import cz.uhk.pro2.flappy.game.tiles.WallTile;
+
 public class GameBoard implements TickAware{
 	Tile[][] tiles;
 	int shiftX = 30;
 	int viewportWidth = 200; //TO DO
 	Bird bird;
+	boolean gameOver;
 	
 	public GameBoard() {
 		tiles = new Tile[20][20]; //TO DO
@@ -20,7 +25,7 @@ public class GameBoard implements TickAware{
 	}
 	
 	/*Kreslí celý herní svìt (zdi, bonusy, ptáka) na plátno g.*/
-	public void draw(Graphics g){
+	public void drawAndTestCollisions(Graphics g){
 		int minJ = shiftX/Tile.SIZE;	//SPOÈÍTÁME PRVNÍ J INDEX BUNKY, KTERY MA SMYSL KRESLIT,JE VIDET VE VIEWPORTU, TJ. NA OBRAZOVCE
 		int maxJ = minJ + viewportWidth/Tile.SIZE + 2;//+2 protože celeciselnì delime jak shiftx tak viewsize,ale chceme zaokrouhlit nahoru
 		for(int i=0; i< tiles.length; i++){
@@ -32,7 +37,23 @@ public class GameBoard implements TickAware{
 				if (t != null){						//je na souradnicich i j dlazdice?
 					int screenX = j*Tile.SIZE - shiftX;
 					int screenY = i*Tile.SIZE;
+					//nakreslíme dlaždici
 					t.draw(g, screenX, screenY);
+					//otestujeme moznou kolizi s ptákem
+					if (t instanceof WallTile){
+						//dlazdice je typu zeï
+						if (bird.collidesWithRectangle(screenX, screenY, Tile.SIZE, Tile.SIZE)){
+							//Došlo ke kolizi ptaka s dlazdici
+							System.out.println("Kolize");
+							gameOver = true;
+							
+						}
+					} else if (t instanceof BonusTile){
+						if (bird.collidesWithRectangle(screenX, screenY, Tile.SIZE, Tile.SIZE)){
+							//Došlo ke kolizi ptaka s dlazdici
+							System.out.println("Sebral Bonus");
+						}
+					}
 				}
 			}
 		}
@@ -43,11 +64,13 @@ public class GameBoard implements TickAware{
 
 	@Override
 	public void tick(long ticksSinceStart) {
-		//s kazdym tickem ve hre posuneme hru o 1 px - pocet ticku a pixelu posunu se rovnaji
-		shiftX = (int)ticksSinceStart;
-		
-		//TODO dame vedet jeste ptakovi ze hodiny tickly
-		bird.tick(ticksSinceStart);
+		if (!gameOver){
+			//s kazdym tickem ve hre posuneme hru o 1 px - pocet ticku a pixelu posunu se rovnaji
+			shiftX = (int)ticksSinceStart;
+			
+			//TODO dame vedet jeste ptakovi ze hodiny tickly
+			bird.tick(ticksSinceStart);
+		}
 	}
 	
 	public int getHeightPix(){
