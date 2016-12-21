@@ -1,9 +1,9 @@
 package cz.uhk.pro2.flappy.game;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.geom.Ellipse2D;
+
 
 public class Bird implements TickAware{
 	//fyzika
@@ -14,7 +14,7 @@ public class Bird implements TickAware{
 	//souradnice stredu ptaka
 	int viewportX;
 	double viewportY;
-	Image image;
+	private Image image;
 	
 	//rychlost padani (pozitivni) nebo vzletu (negativni)
 	double velocityY = koefDown;
@@ -33,12 +33,12 @@ public class Bird implements TickAware{
 	}
 	
 	public void draw(Graphics g){
-		g.setColor(Color.GREEN);
+		//g.setColor(Color.GREEN);
 		//g.fillOval(viewportX-Tile.SIZE/2, (int)viewportY-Tile.SIZE/2, Tile.SIZE, Tile.SIZE);
-		g.drawImage(image, viewportX-Tile.SIZE/2, (int)viewportY-Tile.SIZE/2, null)
 		//debug, souradnice ptaka
-		g.setColor(Color.BLACK);
-		g.drawString(viewportX+", "+viewportY, viewportX, (int)viewportY);
+		//g.setColor(Color.BLACK);
+		//g.drawString(viewportX+", "+viewportY, viewportX, (int)viewportY);
+		g.drawImage(image, viewportX-Tile.SIZE/2, (int)viewportY-Tile.SIZE/2, null);
 	}	
 
 	public boolean collidesWithRectangle(int x, int y, int w, int h) {

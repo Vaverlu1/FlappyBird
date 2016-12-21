@@ -1,9 +1,9 @@
 package cz.uhk.pro2.flappy.game;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import cz.uhk.pro2.flappy.game.tiles.BonusTile;
-import cz.uhk.pro2.flappy.game.tiles.EmptyTile;
 import cz.uhk.pro2.flappy.game.tiles.WallTile;
 
 public class GameBoard implements TickAware{
@@ -11,17 +11,12 @@ public class GameBoard implements TickAware{
 	int shiftX = 30;
 	int viewportWidth = 200; //TO DO
 	Bird bird;
-	boolean gameOver;
+	boolean gameOver = false;
 	
-	public GameBoard() {
-		tiles = new Tile[20][20]; //TO DO
-		//tiles[2][1] = new WallTile();
-		bird = new Bird(viewportWidth/2, tiles.length*Tile.SIZE/2);
-	}
-	
-	public GameBoard(Tile[][] tiles){
+		
+	public GameBoard(Tile[][] tiles, BufferedImage imageOfTheBird){
 		this.tiles = tiles;
-		bird = new Bird(viewportWidth/2, tiles.length*Tile.SIZE/2);
+		bird = new Bird(viewportWidth/2, tiles.length*Tile.SIZE/2, imageOfTheBird);
 	}
 	
 	/*Kreslí celý herní svìt (zdi, bonusy, ptáka) na plátno g.*/
@@ -45,13 +40,14 @@ public class GameBoard implements TickAware{
 						if (bird.collidesWithRectangle(screenX, screenY, Tile.SIZE, Tile.SIZE)){
 							//Došlo ke kolizi ptaka s dlazdici
 							System.out.println("Kolize");
-							gameOver = true;
+							//gameOver = true;
 							
 						}
 					} else if (t instanceof BonusTile){
 						if (bird.collidesWithRectangle(screenX, screenY, Tile.SIZE, Tile.SIZE)){
 							//Došlo ke kolizi ptaka s dlazdici
 							System.out.println("Sebral Bonus");
+							((BonusTile)t).setActive(false, screenX);
 						}
 					}
 				}

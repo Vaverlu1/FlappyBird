@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
@@ -31,7 +32,8 @@ public class CsvGameBoardLoader implements GameBoardLoader{
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(is))){
 			String[] line = br.readLine().split(";");
 			int typeCount = Integer.parseInt(line[0]);
-			Map<String, Tile> tileTypes = new HashMap<>(); 
+			Map<String, Tile> tileTypes = new HashMap<>();
+			BufferedImage imageOfTheBird = null;
 			//Forcyklus pro preskoceni radku s typy dlazdic
 			for (int i = 0; i < typeCount; i++){
 				line = br.readLine().split(";");
@@ -42,8 +44,15 @@ public class CsvGameBoardLoader implements GameBoardLoader{
 				int w = Integer.parseInt(line[4]);
 				int h = Integer.parseInt(line[5]);
 				String url = line[6];
-				Tile tile = createTile(clazz,x,y,w,h, url); 
-				tileTypes.put(tileType, tile); //to do
+				String referencedTileType = (line.length >= 8) ? line[7] : "";
+				Tile referencedTile = tileTypes.get(referencedTileType); 
+				if(clazz.equals("Bird")){
+					//urèije obrazek  ptaka
+					imageOfTheBird = loadImage(x,y,w,h,url);
+				} else {
+					Tile tile = createTile(clazz,x,y,w,h, url, referencedTile); 
+					tileTypes.put(tileType, tile);	
+				}
 			}
 			line = br.readLine().split(";");
 			int rows = Integer.parseInt(line[0]);
@@ -65,27 +74,23 @@ public class CsvGameBoardLoader implements GameBoardLoader{
 						tiles[i][j] = tileTypes.get(cell);
 				}
 			}
-			GameBoard gb = new GameBoard(tiles);
+			GameBoard gb = new GameBoard(tiles, imageOfTheBird);
 			return gb;
 		} catch (IOException e) {
 			throw new RuntimeException("Chyba pøi ètìní souboru", e);
 		}
 	}
 
-	private Tile createTile(String clazz, int x, int y, int w, int h, String url) {
+	private Tile createTile(String clazz, int x, int y, int w, int h, String url, Tile referencedTile) {
 		try{
-			BufferedImage originalImage = ImageIO.read(new URL(url));
-			BufferedImage croppedImage = originalImage.getSubimage(x, y, w, h);
-			BufferedImage resizedImage = new BufferedImage(Tile.SIZE, Tile.SIZE, BufferedImage.TYPE_INT_ARGB);
-			Graphics2D g = resizedImage.createGraphics();
-			g.drawImage(croppedImage, 0, 0, Tile.SIZE,Tile.SIZE, null);
+			BufferedImage resizedImage = loadImage(x, y, w, h, url);
 			switch (clazz){
 			case "Wall":
 				return new WallTile(resizedImage);
 			case "Empty":
 				return new EmptyTile(resizedImage);
 			case "Bonus":
-				return new BonusTile(resizedImage);
+				return new BonusTile(resizedImage, referencedTile);
 			}
 			throw new RuntimeException("Neznámý typ dlaždice " + clazz);
 		} catch (MalformedInputException e){
@@ -93,5 +98,14 @@ public class CsvGameBoardLoader implements GameBoardLoader{
 		} catch (IOException e){
 			throw new RuntimeException("Chyba pri cteni obrazku ", e);
 		}
+	}
+
+	private BufferedImage loadImage(int x, int y, int w, int h, String url) throws IOException, MalformedURLException {
+		BufferedImage originalImage = ImageIO.read(new URL(url));
+		BufferedImage croppedImage = originalImage.getSubimage(x, y, w, h);
+		BufferedImage resizedImage = new BufferedImage(Tile.SIZE, Tile.SIZE, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = resizedImage.createGraphics();
+		g.drawImage(croppedImage, 0, 0, Tile.SIZE,Tile.SIZE, null);
+		return resizedImage;
 	}
 }

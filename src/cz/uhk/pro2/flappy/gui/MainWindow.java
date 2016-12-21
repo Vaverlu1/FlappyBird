@@ -6,10 +6,8 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -21,14 +19,23 @@ import cz.uhk.pro2.flapy.service.CsvGameBoardLoader;
 import cz.uhk.pro2.flapy.service.GameBoardLoader;
 
 public class MainWindow extends JFrame{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	BoardPanel pnl = new BoardPanel();
 	GameBoard gameBoard;
 	long x = 0;
 	
 	class BoardPanel extends JPanel{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public void paint(Graphics g){
 			super.paint(g);
-			gameBoard.draw(g);
+			gameBoard.drawAndTestCollisions(g);
 		}
 	}
 	
@@ -43,7 +50,7 @@ public class MainWindow extends JFrame{
 		}
 		//gameBoard = new GameBoard();
 		add(pnl,BorderLayout.CENTER);
-		pnl.setPreferredSize(new Dimension(200, gameBoard.getHeightPix())); //TODO
+		pnl.setPreferredSize(new Dimension(200, gameBoard.getHeightPix()));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		pack();
 		
